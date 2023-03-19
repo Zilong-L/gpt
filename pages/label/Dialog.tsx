@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import InputBar from './InputBar'
 import { useRouter } from 'next/router'
 import DialogList from './DialogList'
@@ -9,6 +9,8 @@ export default function Dialog() {
   const router = useRouter()
   const { label } = router.query
   const [history, setHistory]: [Message[], any] = useState([])
+  const [temp, setTemp] = useState([])
+  const [loading, setLoading] = useState(false)
   useEffect(() => {
     if (typeof label != 'string') {
       return;
@@ -19,18 +21,38 @@ export default function Dialog() {
       localStorage.setItem(label, JSON.stringify(defaultHistory))
       return;
     }
-    setHistory(JSON.parse(storageHistory))
+    const historyJson = JSON.parse(storageHistory)
+    setHistory(historyJson)
+    const lastPrompt = historyJson.slice(-1)[0]
+    if (lastPrompt['role'] == 'user' && !loading) {
+      setLoading(true)
+    }
+    return () => {
+      setLoading(false);
+      setTemp([])
+    }
   }, [label])
-  async function sendPrompt(prompt: string) {
-    const newHistory = history.concat({ 'role': 'user', 'content': prompt })
-    setHistory(newHistory)
-    setHistory((pre: Message[]) => pre.concat({ 'role': 'assistant', 'content': '' }))
-    const response = await getData(newHistory)
+  useEffect(() => {
+    if (!loading) {
+      return;
+    }
+    try {
+      getData(history).then(response => handleResponse(response))
+    }
+    catch (e) {
+      console.error(e)
+    }
+    finally {
+      setLoading(false)
+    }
+  }, [loading])
+  async function handleResponse(response: Response) {
     if (response.status == 200) {
       const reader = await response?.body?.getReader()
       let content = ""
       let chunk = ''
       let done, value;
+      let i = 0;
       while (!done) {
         ({ value, done } = await reader?.read() as ReadableStreamReadResult<Uint8Array>);
         if (done) {
@@ -41,13 +63,20 @@ export default function Dialog() {
         if (str.endsWith('\n\n')) {
           content += parseResponse(chunk)
           chunk = ''
-          setHistory((history: Message[]) => [...history.slice(0, -1), { ...history[history.length - 1], content }])
+          setTemp([{ 'role': 'assistant', content: content }])
         }
       }
+      setTemp([])
+      setHistory((history: Message[]) => [...history, { role: 'assistant', content: content }])
     }
     else {
       console.log('too many requests, try again later.')
     }
+  }
+  async function sendPrompt(prompt: string) {
+    const newHistory = history.concat({ 'role': 'user', 'content': prompt })
+    setHistory(newHistory)
+    setLoading(true)
   }
   useEffect(() => {
     if (history.length == 0) {
@@ -57,16 +86,16 @@ export default function Dialog() {
       localStorage.setItem(label, JSON.stringify(history))
     }
   }, [history])
+  const MarkdownMemo = useMemo(() => {
+    return <DialogList messages={history.slice(1)} />
+  }, [history])
   return (
     <div className='grid grid-cols-1   justify-items-center  h-screen'>
       <div className='pb-[120px]  overflow-y-scroll w-full text-center'>
-        <DialogList messages={history} />
+        {MarkdownMemo}
+        <DialogList messages={temp} />
       </div>
       <div className="absolute bottom-0 w-full h-[100px]  bg-gradient-to-b from-transparent via-white  to-white">
-
-
-
-
       </div>
       <InputBar sendPrompt={sendPrompt} />
     </div>

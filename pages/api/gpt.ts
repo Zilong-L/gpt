@@ -36,12 +36,18 @@ async function getData(history: Message[]) {
         "stream": true
     }
     console.log(data)
-    const response = await fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: headers,
-    });
-    return response
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: headers,
+        });
+        return response
+
+    }
+    catch (e) {
+        throw (e)
+    }
 }
 
 export { getData }
