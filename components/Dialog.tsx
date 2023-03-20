@@ -10,6 +10,7 @@ export default function Dialog() {
     const { label } = router.query;
     const [history, setHistory]: [Message[], any] = useState([]);
     const [temp, setTemp] = useState([]);
+    const [isBottom, setIsBottom] = useState(false);
     const [loading, setLoading] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
     const storeHistory = () => {
@@ -73,6 +74,15 @@ export default function Dialog() {
                     content += parseResponse(chunk);
                     chunk = "";
                     setTemp([{ role: "assistant", content: content }]);
+                    if (containerRef.current) {
+                        const { scrollTop, scrollHeight, clientHeight } =
+                            containerRef.current;
+                        if (scrollTop + clientHeight + 50 >= scrollHeight) {
+                            setIsBottom(true);
+                        } else {
+                            setIsBottom(false);
+                        }
+                    }
                 }
             }
             setTemp([]);
@@ -87,6 +97,7 @@ export default function Dialog() {
     async function sendPrompt(prompt: string) {
         const newHistory = history.concat({ role: "user", content: prompt });
         setHistory(newHistory);
+        setIsBottom(true);
         setLoading(true);
     }
 
@@ -99,13 +110,13 @@ export default function Dialog() {
     useEffect(CommunicateWithGPT, [loading]);
 
     return (
-        <div
-            ref={containerRef}
-            className="grid h-screen grid-cols-1  justify-items-center "
-        >
-            <div className="w-full  overflow-y-scroll pb-[120px] text-center">
+        <div className="grid h-screen grid-cols-1  justify-items-center ">
+            <div
+                className="w-full  overflow-y-scroll pb-[120px] text-center"
+                ref={containerRef}
+            >
                 {MarkdownMemo}
-                <DialogList messages={temp} scrollToView />
+                <DialogList messages={temp} scrollToView={isBottom} />
             </div>
             <div className="absolute bottom-0 h-[100px] w-full bg-gradient-to-b from-transparent  via-white to-white"></div>
             <InputBar sendPrompt={sendPrompt} />

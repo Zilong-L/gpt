@@ -1,16 +1,25 @@
 import ReactMarkdown from "react-markdown";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Message } from "pages/api/Message";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 interface Props {
     messages: Message[];
+    scrollToView?: boolean;
 }
-function DialogList({ messages }: Props) {
-    if (window == undefined) {
-        return <></>;
+function DialogList({ messages, scrollToView }: Props) {
+    if (typeof window === "undefined") {
+        return <div></div>;
     }
+    const elementRef = useRef<null | HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (elementRef.current && scrollToView) {
+            console.log(scrollToView);
+            elementRef.current.scrollIntoView();
+        }
+    });
     function handleCopy(event: React.MouseEvent<HTMLButtonElement>) {
         console.log(typeof event.target.parentElement.children[0].textContent);
         navigator.clipboard.writeText(
@@ -36,7 +45,7 @@ function DialogList({ messages }: Props) {
         },
     };
     return (
-        <div>
+        <div ref={elementRef}>
             {messages.map((e, i) => {
                 console.log("calculate");
                 return (
