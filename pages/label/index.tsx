@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 
 export default function LabelPage() {
     const router = useRouter();
-    const { label } = router.query;
     const [items, setItems] = useState([]);
 
     useEffect(() => {
@@ -25,7 +24,7 @@ export default function LabelPage() {
     return (
         <SplitView
             leftContent={<SideList items={items} setItems={setItems} />}
-            rightContent={label ? <Dialog /> : <Welcome />}
+            rightContent={<Welcome />}
         />
     );
 }

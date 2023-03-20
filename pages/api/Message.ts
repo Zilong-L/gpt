@@ -1,9 +1,9 @@
-class Message{
-    public role: string;
-    public content: string;
-    constructor() {
-        this.role = '';
-        this.content = '';
+class Message {
+  public role: string;
+  public content: string;
+  constructor() {
+    this.role = '';
+    this.content = '';
   }
 }
 class Messages {
@@ -21,7 +21,7 @@ class Messages {
   public removeLast(): void {
     this.history.pop();
   }
-  public clear(): void{
+  public clear(): void {
     this.history = [];
   }
 
@@ -31,6 +31,6 @@ class Messages {
 
 }
 const defaultHistory = [{ 'role': 'system', 'content': 'you are a helpful assistant that can help user with any questions.' },
-  { 'role': 'user', 'content': 'who are you?' },
-{'role':'assistant','content':'I am a helpful assistant that can help you with any questions. How may I help you today?'}]
-export { Messages,Message,defaultHistory }
+{ 'role': 'user', 'content': 'who are you?' },
+{ 'role': 'assistant', 'content': 'I am a helpful assistant that can help you with any questions. How may I help you today?' }]
+export { Messages, Message, defaultHistory }
