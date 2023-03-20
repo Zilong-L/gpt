@@ -1,11 +1,9 @@
-
-import LabelPage from './label/[label]'
+import LabelPage from "./label/[label]";
 
 export default function Home() {
-
-  return (
-    <div>
-      <LabelPage />
-    </div>
-  )
+    return (
+        <div>
+            <LabelPage />
+        </div>
+    );
 }
