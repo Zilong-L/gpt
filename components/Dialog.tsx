@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import InputBar from "./InputBar";
 import { useRouter } from "next/router";
 import DialogList from "./DialogList";
@@ -11,7 +11,7 @@ export default function Dialog() {
     const [history, setHistory]: [Message[], any] = useState([]);
     const [temp, setTemp] = useState([]);
     const [loading, setLoading] = useState(false);
-
+    const containerRef = useRef<HTMLDivElement | null>(null);
     const storeHistory = () => {
         if (history.length === 0) {
             return;
@@ -99,10 +99,13 @@ export default function Dialog() {
     useEffect(CommunicateWithGPT, [loading]);
 
     return (
-        <div className="grid h-screen grid-cols-1  justify-items-center">
+        <div
+            ref={containerRef}
+            className="grid h-screen grid-cols-1  justify-items-center "
+        >
             <div className="w-full  overflow-y-scroll pb-[120px] text-center">
                 {MarkdownMemo}
-                <DialogList messages={temp} />
+                <DialogList messages={temp} scrollToView />
             </div>
             <div className="absolute bottom-0 h-[100px] w-full bg-gradient-to-b from-transparent  via-white to-white"></div>
             <InputBar sendPrompt={sendPrompt} />
