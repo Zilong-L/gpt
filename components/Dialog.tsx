@@ -6,6 +6,7 @@ import { Message } from "pages/api/Message";
 import { getData } from "pages/api/gpt";
 import { toast } from "react-toastify";
 import { Id } from "react-toastify/dist/types";
+import { read } from "fs";
 
 export default function Dialog() {
     const router = useRouter();
@@ -55,10 +56,15 @@ export default function Dialog() {
         if (!loading) {
             return;
         }
-
         setIsBottom(true);
-        getData(history)
-            .then((response) => handleResponse(response))
+        fetch('/api/gpt',{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({history})
+        })
+            .then(handleResponse)
             .then(() => {
                 toast.update(toastId, {
                     render: "Done",
@@ -89,42 +95,34 @@ export default function Dialog() {
     }
 
     async function handleResponse(response: Response) {
-        if (response.status == 200) {
-            const reader = await response?.body?.getReader();
-            let content = "";
-            let chunk = "";
-            let done, value;
-            while (!done) {
-                ({ value, done } =
-                    (await reader?.read()) as ReadableStreamReadResult<Uint8Array>);
-                if (done) {
-                    break;
-                }
-                const str = new TextDecoder().decode(value);
-                chunk += str;
-                if (str.endsWith("\n\n")) {
-                    content += parseResponse(chunk);
-                    chunk = "";
-                    setTemp([{ role: "assistant", content: content }]);
-                    if (containerRef.current) {
-                        const { scrollTop, scrollHeight, clientHeight } =
-                            containerRef.current;
-                        if (scrollTop + clientHeight + 50 >= scrollHeight) {
-                            setIsBottom(true);
-                        } else {
-                            setIsBottom(false);
-                        }
-                    }
+        if(response.status==200){
+        const reader =  await response?.body?.getReader();
+        let done, value;
+        let newContent = ''
+        while (!done) {
+            ({ value, done } =
+                (await reader?.read()) as ReadableStreamReadResult<Uint8Array>);
+            if (done) {
+                break;
+            }
+            newContent = new TextDecoder().decode(value);
+            setTemp([{ role: "assistant", content: newContent }]);
+            if (containerRef.current) {
+                const { scrollTop, scrollHeight, clientHeight } =
+                    containerRef.current;
+                if (scrollTop + clientHeight + 50 >= scrollHeight) {
+                    setIsBottom(true);
+                } else {
+                    setIsBottom(false);
                 }
             }
-            setTemp([]);
-            setHistory((history: Message[]) => [
-                ...history,
-                { role: "assistant", content: content },
-            ]);
-        } else {
-            console.log("too many requests, try again later.");
         }
+        setTemp([]);
+        setHistory((history: Message[]) => [
+            ...history,
+            { role: "assistant", content: newContent },
+        ]);
+    }
     }
     async function sendPrompt(prompt: string) {
         const newHistory = history.concat({ role: "user", content: prompt });
@@ -163,23 +161,4 @@ export default function Dialog() {
             {!loading && <InputBar sendPrompt={sendPrompt} />}
         </div>
     );
-}
-
-function parseResponse(chunk: string) {
-    let subContent = "";
-    const dataList = chunk
-        .split("\n\n")
-        .filter((e) => e)
-        .map((e) => e.slice(6));
-    for (const data of dataList) {
-        if (data == "[DONE]") {
-            return subContent;
-        }
-        const json = JSON.parse(data);
-        const text = json["choices"][0]["delta"]["content"];
-        if (text) {
-            subContent += text;
-        }
-    }
-    return subContent;
 }

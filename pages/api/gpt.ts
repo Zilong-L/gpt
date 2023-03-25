@@ -1,15 +1,12 @@
 // import { fetch,Body,ResponseType } from '@tauri-apps/api/http';
+import { NextApiRequest, NextApiResponse } from "next";
 import { Messages, Message } from "./Message";
 
 const url = "https://api.openai.com/v1/chat/completions";
-// const url = "https://chatdo.fun/chat";
-// const url = "https://43.159.37.166/chat";
 
-// const api_key = "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";
-const api_key = "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";
 
-// const api_key = "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"
-// const api_key = "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"
+const api_key = process.env.GPT_API_KEY
+
 const Model = "gpt-3.5-turbo";
 const headers = {
     "Content-Type": "application/json",
@@ -28,12 +25,13 @@ function parseResponse(chunk: string) {
         }
         const json = JSON.parse(data);
         const text = json["choices"][0]["delta"]["content"];
-        if (text && text != "\n\n") {
+        if (text) {
             subContent += text;
         }
     }
     return subContent;
 }
+
 async function getData(history: Message[]) {
     const data = {
         model: Model,
@@ -53,23 +51,33 @@ async function getData(history: Message[]) {
         throw e;
     }
 }
-// async function getData(history: Message[]) {
-//     const data = {
-//         model: Model,
-//         messages: history.slice(-11),
-//         temperature: 0.7,
-//         stream: true,
-//     };
-//     console.log(data);
-//     try {
-//         const response = await fetch("http://129.226.203.169/chat", {
-//             method: "POST",
-//             body: JSON.stringify(data),
-//             headers: headers,
-//         });
-//         return response;
-//     } catch (e) {
-//         throw e;
-//     }
-// }
-export { getData };
+export default async function handler(req:NextApiRequest, res:NextApiResponse) {
+    if (req.method === 'POST') {
+      // Handle the POST request here
+        const pipe = await (await getData(req.body.history))
+        const body = pipe.body
+        const reader =  await body?.getReader();
+        let content = "";
+        let chunk = "";
+        let done, value;
+        while (!done) {
+            ({ value, done } =
+                (await reader?.read()) as ReadableStreamReadResult<Uint8Array>);
+            if (done) {
+                break;
+            }
+            const str = new TextDecoder().decode(value);
+            chunk += str;
+            if (str.endsWith("\n\n")) {
+                content += parseResponse(chunk);
+                chunk = "";
+                res.write(content)
+            }
+        }
+        console.log('server end')
+        res.status(200)
+    } else {
+      res.status(405).json({ message: 'Method not allowed' })
+    }
+    res.end()
+  }
