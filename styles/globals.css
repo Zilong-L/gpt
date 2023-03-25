@@ -8,7 +8,16 @@ h2 {
 h3 {
   @apply text-lg;
 }
+ul{
+  @apply list-disc list-outside pl-6;
+}
+ol{
+  @apply list-decimal list-outside pl-6;
+}
 
 
+p{
+  @apply py-2
+}
 @tailwind components;
 @tailwind utilities;

@@ -1,7 +1,6 @@
 import SplitView from "components/SplitView";
 import SideList from "components/SideList";
 import Welcome from "components/Welcome";
-import Dialog from "components/Dialog";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 

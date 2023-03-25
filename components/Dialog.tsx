@@ -2,16 +2,19 @@ import React, { useEffect, useState, useMemo, useRef } from "react";
 import InputBar from "./InputBar";
 import { useRouter } from "next/router";
 import DialogList from "./DialogList";
-import { defaultHistory, Messages, Message } from "pages/api/Message";
+import { Message } from "pages/api/Message";
 import { getData } from "pages/api/gpt";
+import { toast } from "react-toastify";
+import { Id } from "react-toastify/dist/types";
 
 export default function Dialog() {
     const router = useRouter();
     const { label } = router.query;
     const [history, setHistory]: [Message[], any] = useState([]);
-    const [temp, setTemp] = useState([]);
+    const [temp, setTemp]: [Message[], any] = useState([]);
     const [isBottom, setIsBottom] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [toastId, setToastId]: [Id, any] = useState(0);
     const containerRef = useRef<HTMLDivElement | null>(null);
     const storeHistory = () => {
         if (history.length === 0) {
@@ -34,8 +37,14 @@ export default function Dialog() {
         setHistory(historyJson);
         const lastPrompt = historyJson.slice(-1)[0];
         if (lastPrompt["role"] == "user" && !loading) {
+            setToastId(
+                toast.loading("generating...", {
+                    position: toast.POSITION.TOP_CENTER,
+                })
+            );
             setLoading(true);
         }
+
         return () => {
             setLoading(false);
             setTemp([]);
@@ -46,13 +55,37 @@ export default function Dialog() {
         if (!loading) {
             return;
         }
-        try {
-            getData(history).then((response) => handleResponse(response));
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setLoading(false);
-        }
+
+        setIsBottom(true);
+        getData(history)
+            .then((response) => handleResponse(response))
+            .then(() => {
+                toast.update(toastId, {
+                    render: "Done",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 100,
+                });
+            })
+            .catch((e) => {
+                console.error(e);
+                toast.error(e);
+                toast.update(toastId, {
+                    render: "fail to load",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 500,
+                });
+            })
+            .finally(() => {
+                setLoading(false);
+                toast.update(toastId, {
+                    render: "Done",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 100,
+                });
+            });
     }
 
     async function handleResponse(response: Response) {
@@ -61,7 +94,6 @@ export default function Dialog() {
             let content = "";
             let chunk = "";
             let done, value;
-            let i = 0;
             while (!done) {
                 ({ value, done } =
                     (await reader?.read()) as ReadableStreamReadResult<Uint8Array>);
@@ -96,8 +128,13 @@ export default function Dialog() {
     }
     async function sendPrompt(prompt: string) {
         const newHistory = history.concat({ role: "user", content: prompt });
+        console.log(prompt);
         setHistory(newHistory);
-        setIsBottom(true);
+        setToastId(
+            toast.loading("generating...", {
+                position: toast.POSITION.TOP_CENTER,
+            })
+        );
         setLoading(true);
     }
 
@@ -116,10 +153,14 @@ export default function Dialog() {
                 ref={containerRef}
             >
                 {MarkdownMemo}
-                <DialogList messages={temp} scrollToView={isBottom} />
+                <DialogList
+                    messages={temp}
+                    scrollToView={isBottom}
+                    container={containerRef.current}
+                />
             </div>
             <div className="absolute bottom-0 h-[100px] w-full bg-gradient-to-b from-transparent  via-white to-white"></div>
-            <InputBar sendPrompt={sendPrompt} />
+            {!loading && <InputBar sendPrompt={sendPrompt} />}
         </div>
     );
 }
@@ -136,7 +177,7 @@ function parseResponse(chunk: string) {
         }
         const json = JSON.parse(data);
         const text = json["choices"][0]["delta"]["content"];
-        if (text && text != "\n\n") {
+        if (text) {
             subContent += text;
         }
     }

@@ -1,10 +1,9 @@
 import SplitView from "components/SplitView";
 import SideList from "components/SideList";
-import Welcome from "components/Welcome";
 import Dialog from "components/Dialog";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 export default function LabelPage() {
     const [items, setItems] = useState([]);
 
@@ -21,9 +20,12 @@ export default function LabelPage() {
     }, []);
 
     return (
-        <SplitView
-            leftContent={<SideList items={items} setItems={setItems} />}
-            rightContent={<Dialog />}
-        />
+        <div>
+            <ToastContainer />
+            <SplitView
+                leftContent={<SideList items={items} setItems={setItems} />}
+                rightContent={<Dialog />}
+            />
+        </div>
     );
 }

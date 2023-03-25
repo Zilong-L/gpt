@@ -9,8 +9,12 @@ interface Props {
 
 export default function TextEditor({ sendPrompt }: Props) {
     const [value, setValue] = useState("");
-    const textAreaRef = useRef(null);
-
+    const textAreaRef: React.Ref<HTMLTextAreaElement> = useRef(null);
+    useEffect(() => {
+        if (textAreaRef.current) {
+            textAreaRef.current.focus();
+        }
+    }, []);
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key == "Enter" && !event.shiftKey) {
             sendPrompt(value);
@@ -46,6 +50,7 @@ export default function TextEditor({ sendPrompt }: Props) {
         <div className="absolute  bottom-[20px] left-0 right-0 ml-auto mr-auto grid w-5/6 grid-cols-12 rounded border border-gray-300 bg-white py-2 shadow-lg transition-shadow duration-200  focus-within:shadow-sm hover:shadow-sm">
             <div className="col-span-11 w-full">
                 <textarea
+                    ref={textAreaRef}
                     title="textarea"
                     id={"textArea"}
                     className="my-0  w-full resize-none px-4  pt-2 leading-normal focus:border-none focus:outline-none"

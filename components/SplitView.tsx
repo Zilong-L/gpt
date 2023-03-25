@@ -34,13 +34,15 @@ const SplitView: React.FC<Props> = ({ leftContent, rightContent }) => {
     };
 
     return (
-        <div className="flex h-screen flex-col">
+        <div className="flex h-screen flex-col ">
             <div className="flex-shrink-0 flex-grow" id="split-view-container">
                 <div className="flex h-full w-full">
                     {/* <div className="h-full w-full" style={{ flex: `${splitPosition}%` }}>
             {leftContent}
           </div> */}
-                    <div className="h-full w-64">{leftContent}</div>
+                    <div className="hidden h-full w-64 lg:block ">
+                        {leftContent}
+                    </div>
                     <div className="h-full bg-slate-50 hover:cursor-grab">
                         {/* Split line */}
                     </div>
