@@ -54,8 +54,13 @@ async function getData(history: Message[]) {
 export default async function handler(req:NextApiRequest, res:NextApiResponse) {
     if (req.method === 'POST') {
       // Handle the POST request here
-        const pipe = await (await getData(req.body.history))
-        const body = pipe.body
+        try{
+        const response = await getData(req.body.history)
+        if(response.status!==200){
+            console.log(response)
+            throw(`error code: ${response.status}`)
+        }
+        const body = response.body
         const reader =  await body?.getReader();
         let content = "";
         let chunk = "";
@@ -76,6 +81,10 @@ export default async function handler(req:NextApiRequest, res:NextApiResponse) {
         }
         console.log('server end')
         res.status(200)
+    }
+    catch(e){
+        res.write(e)
+    }
     } else {
       res.status(405).json({ message: 'Method not allowed' })
     }
