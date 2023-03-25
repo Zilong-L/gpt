@@ -3,10 +3,8 @@ import InputBar from "./InputBar";
 import { useRouter } from "next/router";
 import DialogList from "./DialogList";
 import { Message } from "pages/api/Message";
-import { getData } from "pages/api/gpt";
 import { toast } from "react-toastify";
 import { Id } from "react-toastify/dist/types";
-import { read } from "fs";
 
 export default function Dialog() {
     const router = useRouter();
