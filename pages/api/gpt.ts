@@ -39,7 +39,6 @@ async function getData(history: Message[]) {
         temperature: 0.7,
         stream: true,
     };
-    console.log('post data',data);
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -56,15 +55,14 @@ export default async function handler(req:NextApiRequest, res:NextApiResponse) {
       // Handle the POST request here
         try{
         const response = await getData(req.body.history)
-        if(response.status!==200){
-            console.log(response)
-            throw(`error code: ${response.status}`)
-        }
         const body = response.body
         const reader =  await body?.getReader();
-        let content = "";
         let chunk = "";
         let done, value;
+        if(response.status!== 200){
+            res.write(`error code: ${response.status}`)
+            res.end()
+        }
         while (!done) {
             ({ value, done } =
                 (await reader?.read()) as ReadableStreamReadResult<Uint8Array>);
@@ -74,12 +72,12 @@ export default async function handler(req:NextApiRequest, res:NextApiResponse) {
             const str = new TextDecoder().decode(value);
             chunk += str;
             if (str.endsWith("\n\n")) {
-                content += parseResponse(chunk);
+                const tmp =parseResponse(chunk);
+                res.write(tmp)
                 chunk = "";
-                res.write(content)
             }
         }
-        console.log('server end')
+        
         res.status(200)
     }
     catch(e){

@@ -103,7 +103,7 @@ export default function Dialog() {
             if (done) {
                 break;
             }
-            newContent = new TextDecoder().decode(value);
+            newContent += new TextDecoder().decode(value);
             setTemp([{ role: "assistant", content: newContent }]);
             if (containerRef.current) {
                 const { scrollTop, scrollHeight, clientHeight } =
