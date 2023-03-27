@@ -37,18 +37,9 @@ function DialogList({ messages, scrollToView, container }: Props) {
             autoClose: 500,
         });
     }
-    const customStyles = {  
-        h1: 'text-3xl font-bold mb-6',  
-        p: 'text-lg leading-relaxed mb-4',  
-        a: 'text-blue-500',  
-        ul: 'list-disc list-inside mb-4',  
-        li: 'mb-2',  
-      } 
+
     
     const renderers = {
-        list:({ language, inline, className, children, ...props }: any) => {
-            return <></>
-        },
         code: ({ language, inline, className, children, ...props }: any) => {
             const match = /language-(\w+)/.exec(className || "");
             return !inline ? (
@@ -69,7 +60,7 @@ function DialogList({ messages, scrollToView, container }: Props) {
                     </button>
                 </div>
             ) : (
-                <pre className="inline">{children}</pre>
+                <pre className="inline  ">{children}</pre>
             );
         },
     };
@@ -88,25 +79,20 @@ function DialogList({ messages, scrollToView, container }: Props) {
                         }`}
                     >
                         <div className="grid w-[80%] grid-cols-12 min-[1440px]:w-[1024px]">
-                            <div className="col-span1 relative top-2">
+                            <div className="col-span1 relative  top-2">
                                 {e.role == "assistant" ? (
                                     <VscGithubAlt />
                                 ) : (
                                     <FiUser />
                                 )}
                             </div>
-                            <div className="col-span-11 overflow-x-auto leading-8 ">
-                                {e.role == "assistant" ? (
-                                    <ReactMarkdown
-                                        skipHtml={true}
+                            <div className="col-span-11  leading-8 ">
+                                <ReactMarkdown
                                         components={renderers}
                                         remarkPlugins={[parse, gfm]}
                                     >
                                         {markdown}
                                     </ReactMarkdown>
-                                ) : (
-                                    <pre className="font-sans">{markdown}</pre>
-                                )}
                             </div>
                         </div>
                     </div>
