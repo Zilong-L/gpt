@@ -78,7 +78,7 @@ function DialogList({ messages, scrollToView, container }: Props) {
                             e.role == "assistant" ? "border bg-gray-100" : ""
                         }`}
                     >
-                        <div className="grid w-[90%] md:w-[80%] grid-cols-12 min-[1440px]:w-[1024px]">
+                        <div className="grid w-[90%] md:w-[80%] grid-cols-6 md:grid-cols-12 min-[1440px]:w-[1024px]">
                             <div className="col-span1 relative text-3xl py-2">
                                 {e.role == "assistant" ? (
                                     <VscGithubAlt />
@@ -86,7 +86,7 @@ function DialogList({ messages, scrollToView, container }: Props) {
                                     <FiUser />
                                 )}
                             </div>
-                            <div className="col-span-11  leading-8 ">
+                            <div className="col-span-5 md:col-span-11  leading-8 ">
                                 <ReactMarkdown
                                         components={renderers}
                                         remarkPlugins={[parse, gfm]}
