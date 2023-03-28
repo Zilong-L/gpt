@@ -55,12 +55,12 @@ export default function Dialog() {
             return;
         }
         setIsBottom(true);
-        fetch('/api/gpt',{
-            method:'POST',
-            headers:{
-                'Content-Type':'application/json'
+        fetch("/api/gpt", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
             },
-            body:JSON.stringify({history})
+            body: JSON.stringify({ history }),
         })
             .then(handleResponse)
             .then(() => {
@@ -93,34 +93,34 @@ export default function Dialog() {
     }
 
     async function handleResponse(response: Response) {
-        if(response.status==200){
-        const reader =  await response?.body?.getReader();
-        let done, value;
-        let newContent = ''
-        while (!done) {
-            ({ value, done } =
-                (await reader?.read()) as ReadableStreamReadResult<Uint8Array>);
-            if (done) {
-                break;
-            }
-            newContent += new TextDecoder().decode(value);
-            setTemp([{ role: "assistant", content: newContent }]);
-            if (containerRef.current) {
-                const { scrollTop, scrollHeight, clientHeight } =
-                    containerRef.current;
-                if (scrollTop + clientHeight + 50 >= scrollHeight) {
-                    setIsBottom(true);
-                } else {
-                    setIsBottom(false);
+        if (response.status == 200) {
+            const reader = await response?.body?.getReader();
+            let done, value;
+            let newContent = "";
+            while (!done) {
+                ({ value, done } =
+                    (await reader?.read()) as ReadableStreamReadResult<Uint8Array>);
+                if (done) {
+                    break;
+                }
+                newContent += new TextDecoder().decode(value);
+                setTemp([{ role: "assistant", content: newContent }]);
+                if (containerRef.current) {
+                    const { scrollTop, scrollHeight, clientHeight } =
+                        containerRef.current;
+                    if (scrollTop + clientHeight + 50 >= scrollHeight) {
+                        setIsBottom(true);
+                    } else {
+                        setIsBottom(false);
+                    }
                 }
             }
+            setTemp([]);
+            setHistory((history: Message[]) => [
+                ...history,
+                { role: "assistant", content: newContent },
+            ]);
         }
-        setTemp([]);
-        setHistory((history: Message[]) => [
-            ...history,
-            { role: "assistant", content: newContent },
-        ]);
-    }
     }
     async function sendPrompt(prompt: string) {
         const newHistory = history.concat({ role: "user", content: prompt });
@@ -143,7 +143,7 @@ export default function Dialog() {
     useEffect(CommunicateWithGPT, [loading]);
 
     return (
-        <div className="grid h-screen grid-cols-1  justify-items-center ">
+        <div className="hscreen_for_mobile grid transform-gpu  grid-cols-1 justify-items-center overflow-y-auto ">
             <div
                 className="w-full  overflow-y-scroll pb-[120px] text-center"
                 ref={containerRef}
@@ -155,7 +155,7 @@ export default function Dialog() {
                     container={containerRef.current}
                 />
             </div>
-            <div className="absolute bottom-0 h-[100px] w-full bg-gradient-to-b from-transparent  via-white to-white"></div>
+            <div className="fixed bottom-0 h-[100px] w-full bg-gradient-to-b from-transparent  via-white to-white"></div>
             {!loading && <InputBar sendPrompt={sendPrompt} />}
         </div>
     );

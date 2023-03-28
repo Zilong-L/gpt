@@ -19,5 +19,9 @@ ol{
 p{
   @apply py-2
 }
+.hscreen_for_mobile{
+  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
+}
 @tailwind components;
 @tailwind utilities;

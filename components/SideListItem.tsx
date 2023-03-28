@@ -18,8 +18,14 @@ const Label: React.FC<LabelProps> = ({
     const [editingLabel, setEditingLabel] = useState(item.label);
     const router = useRouter();
     const id = router.query.label;
+    const inputRef = React.useRef<HTMLInputElement>(null);
     const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
         setIsEditing(true);
+        console.log('ref')
+
+        if(inputRef.current){
+            inputRef.current.focus();
+        }
         e.stopPropagation();
     };
     const handleRouter = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -41,11 +47,11 @@ const Label: React.FC<LabelProps> = ({
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEditingLabel(event.target.value);
+        
     };
 
     const handleSaveClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         handleSave(item.id, editingLabel);
-
         setIsEditing(false);
     };
 
@@ -56,17 +62,18 @@ const Label: React.FC<LabelProps> = ({
             }`}
             onClick={handleRouter}
         >
-            {isEditing ? (
+            
                 <input
+                    ref={inputRef}
                     title="input"
                     type="text"
-                    className="w-full bg-transparent p-2 text-teal-200 focus:outline-none"
+                    className={`w-full bg-transparent p-2  text-teal-200 focus:outline-none  ${isEditing? 'block' : 'hidden'}`}
                     value={editingLabel}
                     onChange={handleInputChange}
                 />
-            ) : (
-                <div className="text-teal-200">{item.label}</div>
-            )}
+            
+                <div className={`${isEditing? 'hidden' : 'block'} py-1 text-teal-200`}>{item.label}</div>
+            
 
             <div className="flex items-center">
                 {isEditing ? (
