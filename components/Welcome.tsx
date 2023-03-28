@@ -23,7 +23,7 @@ export default function Welcome() {
         router.push(`/label/${id}`);
     }
     return (
-        <div className="grid hscreen_for_mobild grid-cols-1  grid-rows-2 items-end justify-items-center">
+        <div className="hscreen_for_mobile grid grid-cols-1  grid-rows-2 items-end justify-items-center">
             <div>
                 <h1>ChatGPT</h1>
                 <ul>
