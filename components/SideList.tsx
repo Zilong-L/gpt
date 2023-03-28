@@ -27,7 +27,23 @@ const SideList: React.FC<SideListProps> = ({ items, setItems }) => {
         event.preventDefault();
         router.push(`/label/${id}`);
     };
-    const handleSave = (id: string, label: string) => {};
+    const handleSave = (id: string, newLabel: string) => {
+        const list = localStorage.getItem("gpt-labels");
+        if (list) {
+            const parsedList = JSON.parse(list);
+            const updatedList = parsedList.map((item: any) => {
+                if (item.id === id) {
+                    return {
+                        ...item,
+                        label: newLabel,
+                    };
+                }
+                return item;
+            });
+            localStorage.setItem("gpt-labels", JSON.stringify(updatedList));
+            setItems(updatedList);
+        }
+    };
     const handleDelete = (id: string) => {
         const newLabels = items.filter((e) => e.id != id);
         localStorage.setItem("gpt-labels", JSON.stringify(newLabels));
@@ -52,11 +68,6 @@ const SideList: React.FC<SideListProps> = ({ items, setItems }) => {
     };
     return (
         <div className="flex h-full flex-col bg-neutral-600">
-            {items.map((item: Item) => (
-                <div key={item.id}>
-                    <SideListItem {...Props} item={item} />
-                </div>
-            ))}
             <div className="py-2 hover:cursor-pointer hover:bg-neutral-700">
                 <button
                     onClick={handleNewChat}
@@ -65,6 +76,11 @@ const SideList: React.FC<SideListProps> = ({ items, setItems }) => {
                     New Chat
                 </button>
             </div>
+            {items.map((item: Item) => (
+                <div key={item.id}>
+                    <SideListItem {...Props} item={item} />
+                </div>
+            ))}
         </div>
     );
 };

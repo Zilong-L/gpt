@@ -47,8 +47,8 @@ export default function TextEditor({ sendPrompt }: Props) {
     }
 
     return (
-        <div className="absolute  bottom-[20px] left-0 right-0 ml-auto mr-auto grid w-5/6  grid-cols-6 md:grid-cols-12 rounded border border-gray-300 bg-white py-2 shadow-lg transition-shadow duration-200  focus-within:shadow-sm hover:shadow-sm">
-            <div className="col-span-5 md:col-span-11 w-full">
+        <div className="fixed bottom-[20px] left-0 right-0 ml-auto mr-auto grid w-5/6  grid-cols-6 rounded border border-gray-300 bg-white py-2 shadow-lg transition-shadow duration-200 focus-within:shadow-sm  hover:shadow-sm md:grid-cols-12">
+            <div className="col-span-5 w-full md:col-span-11">
                 <textarea
                     ref={textAreaRef}
                     title="textarea"
