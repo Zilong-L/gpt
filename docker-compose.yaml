@@ -3,6 +3,5 @@ services:
   gpt:
     build: .
     image: gpt_image
-    ports:
-      - "3000:3000"
     container_name: gpt
+    network_mode: "host"

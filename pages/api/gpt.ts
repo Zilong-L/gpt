@@ -81,7 +81,8 @@ export default async function handler(req:NextApiRequest, res:NextApiResponse) {
         res.status(200)
     }
     catch(e){
-        res.write(e)
+        console.log(e)
+        res.write('server error')
     }
     } else {
       res.status(405).json({ message: 'Method not allowed' })
