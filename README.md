@@ -1,15 +1,21 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Prerequisite
+# Prerequisites
+## Node version
 
-First, make sure Node version is 18.x, run:
+make sure Node version is 18.x, run:
     
     node -v
 
-I get result of v18.15.0, I've tested that 16.x doesn't work.
+I get result of v18.15.0, I've tested that 16.x doesn't work. So the docker runs in v18.
 
-## Get Started
+## API Key env file
+create a .env.local file in the root directory, and add the following line:
+    
+    GPT_API_KEY="sk-xxxxxxxxxxxxxxx"
 
+# Get Started
+## Development
 run npm i and wait for modules to install.
 
     npm i
@@ -17,12 +23,20 @@ then run npm run to start the dev server.
 ```bash
 npm run dev
 ```
-
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Deployment
 
 
-## Deploy
+~~  I failed to build a docker image to serve this app. If you can accomplish that, hope you can give me a hand.  ~~
 
-I failed to build a docker image to serve this app. If you can accomplish that, hope you can give me a hand.
+Run this command to set up a docker image and run it.
+
+    docker-compose up --build -d
+
+
+
+
+
+
 
