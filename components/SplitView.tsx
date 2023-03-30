@@ -13,8 +13,8 @@ const SplitView: React.FC<Props> = ({ leftContent, rightContent }) => {
     const [swipeProgress, setSwipeProgress] = useState(0);
     const [dragging, setDragging] = useState(false);
     const router = useRouter();
-    const { theme,toggleTheme} = useContext(ThemeContext);
-    
+    const { theme, toggleTheme } = useContext(ThemeContext);
+
     useEffect(() => {
         if (showList) {
             setSwipeProgress(80);
@@ -115,16 +115,23 @@ const SplitView: React.FC<Props> = ({ leftContent, rightContent }) => {
                     <div
                         className="col-span-8 col-start-3 row-start-1 row-end-3 bg-black"
                         style={{ background: theme.banner }}
-                    onClick={toggleTheme}
-
+                        onClick={toggleTheme}
                     ></div>
-                    <div className="col-span-8 col-start-3 row-start-3 row-end-[11]">
+                    <div className="col-span-8 col-start-3 row-start-3 row-end-[11] ">
                         {leftContent}
                     </div>
                 </div>
             </div>
-            <div className="z-10 hidden h-full w-[300px]  lg:block ">
-                {leftContent}
+            <div
+                className="z-10 hidden h-full w-[300px]  lg:grid "
+                style={{ gridTemplateRows: "repeat(10,1fr)" }}
+            >
+                <div
+                    className="row-start-1 row-end-2 bg-black"
+                    style={{ background: theme.banner }}
+                    onClick={toggleTheme}
+                ></div>
+                <div className="row-start-2 row-end-[11]">{leftContent}</div>
             </div>
 
             <div
