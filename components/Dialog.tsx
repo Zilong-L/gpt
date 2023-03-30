@@ -5,7 +5,8 @@ import DialogList from "./DialogList";
 import { Message } from "pages/api/Message";
 import { toast } from "react-toastify";
 import { Id } from "react-toastify/dist/types";
-
+import { ThemeContext } from "./ThemeContext";
+import { useContext } from "react";
 export default function Dialog() {
     const router = useRouter();
     const { label } = router.query;
@@ -15,6 +16,7 @@ export default function Dialog() {
     const [loading, setLoading] = useState(false);
     const [toastId, setToastId]: [Id, any] = useState(0);
     const containerRef = useRef<HTMLDivElement | null>(null);
+    const {theme} = useContext(ThemeContext)
     const storeHistory = () => {
         if (history.length === 0) {
             return;
@@ -143,7 +145,8 @@ export default function Dialog() {
     useEffect(CommunicateWithGPT, [loading]);
 
     return (
-        <div className="hscreen_for_mobile grid transform-gpu  grid-cols-1 justify-items-center overflow-y-auto ">
+        <div className="hscreen_for_mobile grid break-words transform-gpu  grid-cols-1 justify-items-center overflow-y-auto "
+        style={{background:theme.userBackground}}>
             <div
                 className="w-full  overflow-y-scroll pb-[120px] text-center"
                 ref={containerRef}
@@ -155,7 +158,11 @@ export default function Dialog() {
                     container={containerRef.current}
                 />
             </div>
-            <div className="fixed bottom-0 h-[100px] w-full bg-gradient-to-b from-transparent  via-white to-white"></div>
+            <div className="fixed bottom-0 h-[100px] w-full "
+                style={{
+                    background: `linear-gradient(to bottom, transparent, ${theme.userBackground},${theme.userBackground})`
+                }}
+            ></div>
             {!loading && <InputBar sendPrompt={sendPrompt} />}
         </div>
     );

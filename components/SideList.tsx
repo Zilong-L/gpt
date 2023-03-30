@@ -3,6 +3,9 @@ import { useRouter } from "next/router";
 import SideListItem from "./SideListItem";
 import { v4 as uuidv4 } from "uuid";
 import { defaultHistory } from "pages/api/Message";
+import { ThemeContext } from "components/ThemeContext";
+import { useContext } from "react";
+import styled from "styled-components";
 
 type Item = {
     label: string;
@@ -16,6 +19,17 @@ type SideListProps = {
 
 const SideList: React.FC<SideListProps> = ({ items, setItems }) => {
     const router = useRouter();
+    const { theme } = useContext(ThemeContext);
+    const StyledList = styled.div`
+        background-color: ${theme.background};
+        color: ${theme.text};
+        padding: 0.75rem 0.5rem;
+        color: ${theme.text};
+        :hover {
+            background-color: ${theme.backgroundSelected};
+            cursor: pointer;
+        }
+    `;
     if (!items) {
         return <></>;
     }
@@ -53,7 +67,7 @@ const SideList: React.FC<SideListProps> = ({ items, setItems }) => {
         console.log(`/label/${newLabels.length ? newLabels[0].id : ""}`);
         setItems(newLabels);
     };
-    const handleNewChat = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const handleNewChat = (event: React.MouseEvent<HTMLDivElement>) => {
         const id = uuidv4();
         const newLabels = [{ id: id, label: "New Chat" }].concat(items);
         localStorage.setItem("gpt-labels", JSON.stringify(newLabels));
@@ -67,18 +81,14 @@ const SideList: React.FC<SideListProps> = ({ items, setItems }) => {
         handleDelete,
     };
     return (
-        <div className="flex h-full flex-col bg-neutral-600">
-            <div className="py-2 hover:cursor-pointer hover:bg-neutral-700">
-                <button
-                    onClick={handleNewChat}
-                    className="flex w-full  rounded-md px-2 py-1 text-teal-200  "
-                >
-                    New Chat
-                </button>
-            </div>
+        <div
+            className="flex h-full flex-col overflow-y-auto select-none "
+            style={{ background: theme.background }}
+        >
+            <StyledList onClick={handleNewChat}>开启新对话</StyledList>
             {items.map((item: Item) => (
                 <div key={item.id}>
-                    <SideListItem {...Props} item={item} />
+                    <SideListItem {...Props} item={item} theme={theme} />
                 </div>
             ))}
         </div>

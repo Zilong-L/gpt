@@ -6,6 +6,7 @@ type LabelProps = {
     handleClick: (event: React.MouseEvent<HTMLDivElement>, id: string) => void;
     handleSave: (id: string, label: string) => void;
     handleDelete: (id: string) => void;
+    theme:any
 };
 
 const Label: React.FC<LabelProps> = ({
@@ -13,6 +14,7 @@ const Label: React.FC<LabelProps> = ({
     handleClick,
     handleSave,
     handleDelete,
+    theme
 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editingLabel, setEditingLabel] = useState(item.label);
@@ -57,35 +59,36 @@ const Label: React.FC<LabelProps> = ({
 
     return (
         <div
-            className={`flex justify-between p-2 hover:cursor-pointer hover:bg-neutral-700 ${
-                id === item.id ? "bg-neutral-800" : ""
-            }`}
+            className="flex justify-between p-2 hover:cursor-pointer  "
+            style={{background:id===item.id?theme.backgroundSelected:"",color:theme.text}}
             onClick={handleRouter}
         >
-            
                 <input
                     ref={inputRef}
                     title="input"
                     type="text"
-                    className={`w-full bg-transparent p-2  text-teal-200 focus:outline-none  ${isEditing? 'block' : 'hidden'}`}
+                    className={`w-full bg-transparent p-2   focus:outline-none  ${isEditing? 'block' : 'hidden'}`}
                     value={editingLabel}
                     onChange={handleInputChange}
                 />
             
-                <div className={`${isEditing? 'hidden' : 'block'} py-1 text-teal-200`}>{item.label}</div>
+                <div className={`${isEditing? 'hidden' : 'block'} py-1 `}
+                
+                >{item.label}</div>
             
 
             <div className="flex items-center">
                 {isEditing ? (
                     <div className="flex items-center">
                         <button
-                            className="mr-2 rounded-md px-2 py-1 text-teal-200 hover:bg-neutral-600 hover:text-teal-100  "
+                            className="mr-2 rounded-md px-2 py-1   "
                             onClick={handleSaveClick}
+                            
                         >
                             Save
                         </button>
                         <button
-                            className="rounded-md px-2 py-1 text-teal-200 hover:bg-neutral-600 hover:text-teal-100"
+                            className="rounded-md px-2 py-1   "
                             onClick={handleCancel}
                         >
                             Cancel
@@ -94,13 +97,13 @@ const Label: React.FC<LabelProps> = ({
                 ) : (
                     <div className="flex items-center">
                         <button
-                            className="mr-2 rounded-md px-2  py-1 text-teal-200 hover:bg-neutral-600 hover:text-teal-100"
+                            className="mr-2 rounded-md px-2  py-1   "
                             onClick={handleEdit}
                         >
                             Edit
                         </button>
                         <button
-                            className="rounded-md px-2 py-1 text-teal-200 hover:bg-neutral-600 hover:text-teal-100"
+                            className="rounded-md px-2 py-1   "
                             onClick={handleDeleteClick}
                         >
                             Delete

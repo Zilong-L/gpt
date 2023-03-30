@@ -6,9 +6,11 @@ import { atomDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { toast } from "react-toastify";
 import { VscGithubAlt } from "react-icons/vsc";
 import { FiUser } from "react-icons/fi";
-import rehypeRaw from "rehype-raw";
 import gfm from "remark-gfm";
 import parse from "remark-parse";
+import { ThemeContext } from "./ThemeContext";
+import { useContext } from "react";
+
 interface Props {
     messages: Message[];
     scrollToView?: boolean;
@@ -17,7 +19,7 @@ interface Props {
 
 function DialogList({ messages, scrollToView, container }: Props) {
     const elementRef = useRef<null | HTMLDivElement>(null);
-
+    const { theme } = useContext(ThemeContext);
     useEffect(() => {
         if (container && elementRef.current && scrollToView) {
             container.scrollTo({
@@ -38,7 +40,6 @@ function DialogList({ messages, scrollToView, container }: Props) {
         });
     }
 
-    
     const renderers = {
         code: ({ language, inline, className, children, ...props }: any) => {
             const match = /language-(\w+)/.exec(className || "");
@@ -74,25 +75,30 @@ function DialogList({ messages, scrollToView, container }: Props) {
                 return (
                     <div
                         key={i}
-                        className={`grid place-items-center py-8 text-left font-sans text-xl ${
-                            e.role == "assistant" ? "border bg-gray-100" : ""
-                        }`}
+                        className={`grid place-items-center py-8 text-left font-sans text-xl `}
+                        style={{
+                            background:
+                                e.role == "assistant"
+                                    ? theme.botBackground
+                                    : theme.userBackground,
+                        }}
                     >
-                        <div className="grid w-[90%] md:w-[80%] grid-cols-6 md:grid-cols-12 min-[1440px]:w-[1024px]">
-                            <div className="col-span1 relative text-3xl py-2">
+                        <div className="grid w-[90%] grid-cols-6 md:w-[80%] md:grid-cols-12 min-[1440px]:w-[1024px]"
+                           style={{color:theme.text}}>
+                            <div className="col-span1 relative py-2 text-3xl">
                                 {e.role == "assistant" ? (
                                     <VscGithubAlt />
                                 ) : (
                                     <FiUser />
                                 )}
                             </div>
-                            <div className="col-span-5 md:col-span-11  leading-8 ">
+                            <div className="col-span-5 leading-8  md:col-span-11 ">
                                 <ReactMarkdown
-                                        components={renderers}
-                                        remarkPlugins={[parse, gfm]}
-                                    >
-                                        {markdown}
-                                    </ReactMarkdown>
+                                    components={renderers}
+                                    remarkPlugins={[parse, gfm]}
+                                >
+                                    {markdown}
+                                </ReactMarkdown>
                             </div>
                         </div>
                     </div>
