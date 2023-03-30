@@ -99,6 +99,7 @@ export default function Dialog() {
             const reader = await response?.body?.getReader();
             let done, value;
             let newContent = "";
+            let start = false;
             while (!done) {
                 ({ value, done } =
                     (await reader?.read()) as ReadableStreamReadResult<Uint8Array>);
@@ -107,11 +108,13 @@ export default function Dialog() {
                 }
                 newContent += new TextDecoder().decode(value);
                 setTemp([{ role: "assistant", content: newContent }]);
+                
                 if (containerRef.current) {
                     const { scrollTop, scrollHeight, clientHeight } =
                         containerRef.current;
-                    if (scrollTop + clientHeight + 50 >= scrollHeight) {
+                    if (!start ||scrollTop + clientHeight + 50 >= scrollHeight) {
                         setIsBottom(true);
+                        start = true
                     } else {
                         setIsBottom(false);
                     }
