@@ -14,6 +14,13 @@ fi
 # Check if Docker is installed
 if ! command -v docker &> /dev/null; then
     # Install Docker
+    
+    read -p "you need to REBOOT after Docker installation. (yes/n): " answer
+
+    if [[ $answer != "yes" ]]; then
+      echo "Exiting script."
+      exit 1
+    fi
     sudo apt update
     sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
