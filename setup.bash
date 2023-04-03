@@ -1,5 +1,16 @@
 #!/bin/bash
 
+
+# Prompt the user before modifying the Nginx configuration file
+read -p "!!!!!WARNING!!!!! This script will modify the Nginx configuration file. Are you sure you want to continue? (yes/n): " answer
+
+if [[ $answer != "yes" ]]; then
+  echo "Exiting script."
+  exit 1
+fi
+
+
+
 # Check if Docker is installed
 if ! command -v docker &> /dev/null; then
     # Install Docker
