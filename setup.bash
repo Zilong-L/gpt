@@ -64,5 +64,20 @@ if [ ! -f ".env.local" ]; then
     echo "GPT_API_KEY=$GPT_API_KEY" >> .env.local
 fi
 
+check_docker_compose() {
+    if command -v docker-compose &> /dev/null; then
+        DOCKER_COMPOSE_CMD="docker-compose"
+    elif docker compose version &> /dev/null; then
+        DOCKER_COMPOSE_CMD="docker compose"
+    else
+        echo "Neither docker-compose nor docker compose found. Please install one of them."
+        exit 1
+    fi
+}
+
+# Check if Docker is installed
+# ... (rest of the script remains unchanged) ...
+
 # 5. Run docker-compose with build and detached options
-docker compose up --build -d
+check_docker_compose
+$DOCKER_COMPOSE_CMD up --build -d
