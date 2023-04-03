@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Initialize a flag to indicate if a reboot is required
-reboot_required=false
-
 # Check if Docker is installed
 if ! command -v docker &> /dev/null; then
     # Install Docker
@@ -18,15 +15,15 @@ if ! command -v docker &> /dev/null; then
     newgrp docker
 
     # Set the reboot flag
-    reboot_required=true
+    echo "Docker have been installed. Please reboot the system and run the script again."
+    echo "Docker have been installed. Please reboot the system and run the script again."
+    echo "Docker have been installed. Please reboot the system and run the script again."
+    
+    exit 1
 fi
 
 # allow traffic to pass http port 80 on ubuntu.
 sudo ufw allow http
-if [ "$reboot_required" = true ]; then
-    echo "Docker and/or nginx have been installed. Please reboot the system and run the script again."
-    exit 1
-fi
 
 # Check if nginx is installed
 if ! command -v nginx &> /dev/null; then
@@ -52,15 +49,10 @@ EOF"
     # 3. Restart nginx
     sudo systemctl restart nginx
 
-    # Set the reboot flag
-    reboot_required=true
+
 fi
 
-# If reboot is required, prompt the user and exit the script
-if [ "$reboot_required" = true ]; then
-    echo "Docker and/or nginx have been installed. Please reboot the system and run the script again."
-    exit 1
-fi
+
 
 
 # 4. create .env.local file and ask user for GPT_API_KEY
