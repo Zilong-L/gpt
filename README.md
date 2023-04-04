@@ -34,6 +34,7 @@ Run this command to set up a docker image and run it.
 
     docker-compose up --build -d
 
+## Deploy all in one script
 If you have a empty server, run these command to start a website.
 
     cd gpt
