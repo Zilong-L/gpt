@@ -17,19 +17,21 @@ type SideListProps = {
     setItems: React.Dispatch<any>;
 };
 
+const StyledList = styled.div`
+    background-color: ${({ theme }) => theme.background};
+    color: ${({ theme }) => theme.text};
+    margin: 0.5rem 0.5rem;
+    padding: 0.75rem 0.5rem;
+    color: ${({ theme }) => theme.text};
+    :hover {
+        background-color: ${({ theme }) => theme.backgroundSelected};
+        cursor: pointer;
+    }
+`;
 const SideList: React.FC<SideListProps> = ({ items, setItems }) => {
     const router = useRouter();
     const { theme } = useContext(ThemeContext);
-    const StyledList = styled.div`
-        background-color: ${theme.background};
-        color: ${theme.text};
-        padding: 0.75rem 0.5rem;
-        color: ${theme.text};
-        :hover {
-            background-color: ${theme.backgroundSelected};
-            cursor: pointer;
-        }
-    `;
+
     if (!items) {
         return <></>;
     }
@@ -69,7 +71,10 @@ const SideList: React.FC<SideListProps> = ({ items, setItems }) => {
     };
     const handleNewChat = (event: React.MouseEvent<HTMLDivElement>) => {
         const id = uuidv4();
-        const newLabels = [{ id: id, label: "New Chat" }].concat(items);
+        const length = items.length;
+        const newLabels = [{ id: id, label: `对话 ${length + 1}` }].concat(
+            items
+        );
         localStorage.setItem("gpt-labels", JSON.stringify(newLabels));
         localStorage.setItem(id, JSON.stringify(defaultHistory));
         setItems(newLabels);
@@ -82,12 +87,16 @@ const SideList: React.FC<SideListProps> = ({ items, setItems }) => {
     };
     return (
         <div
-            className="flex h-full flex-col overflow-y-auto select-none "
+            className="flex h-full select-none flex-col overflow-y-auto   "
             style={{ background: theme.background }}
         >
-            <StyledList onClick={handleNewChat}>开启新对话</StyledList>
+            <div className="">
+                <StyledList theme={theme} onClick={handleNewChat}>
+                    开启新对话
+                </StyledList>
+            </div>
             {items.map((item: Item) => (
-                <div key={item.id}>
+                <div key={item.id} className="p-2">
                     <SideListItem {...Props} item={item} theme={theme} />
                 </div>
             ))}
