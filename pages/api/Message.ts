@@ -30,7 +30,7 @@ class Messages {
   }
 
 }
-const defaultHistory = [{ 'role': 'system', 'content': 'you are a helpful assistant that can help user with any questions.' },
-{ 'role': 'user', 'content': 'who are you?' },
-{ 'role': 'assistant', 'content': 'I am a helpful assistant that can help you with any questions. How may I help you today?' }]
+const defaultHistory = [{ 'role': 'system', 'content': '你是一位可以帮助人解答问题的助手。' },
+{ 'role': 'user', 'content': '你是谁？' },
+{ 'role': 'assistant', 'content': '我是一位可以解答问题的助手。有什么可以帮您的吗？' }]
 export { Messages, Message, defaultHistory }

@@ -27,8 +27,11 @@ export default function Welcome() {
             <div>
                 <h1>ChatGPT</h1>
                 <ul>
-                    <li>按Enter或者飞机发送</li>
-                    <li>shift+Enter换行</li>
+                    <li>数据只更新到2021年9月，之后的事情一概不知</li>
+                    <li>可能会给出错误的答案，请自行判断</li>
+                    <li>仅限学习工作使用，不要透露隐私信息</li>
+                    <li>英文效果可能好一点</li>
+
                 </ul>
             </div>
             <InputBar sendPrompt={sendPrompt} />
