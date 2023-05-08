@@ -17,11 +17,11 @@ export default function Dialog() {
     const [toastId, setToastId]: [Id, any] = useState(0);
     const containerRef = useRef<HTMLDivElement | null>(null);
     const { theme } = useContext(ThemeContext);
-    const abortControllerRef = useRef(null);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
     const handleCancel = () => {
         if (abortControllerRef.current) {
-            setHistory((history) => [
+            setHistory((history: Message[]) => [
                 ...history,
                 {
                     role: "assistant",
