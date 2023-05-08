@@ -18,7 +18,8 @@
     "paths": {
       "@/*": ["./*"]
     }
+    
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "lib/mongodb.js"],
   "exclude": ["node_modules"]
 }

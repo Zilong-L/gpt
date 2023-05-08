@@ -16,7 +16,65 @@ export default function Dialog() {
     const [loading, setLoading] = useState(false);
     const [toastId, setToastId]: [Id, any] = useState(0);
     const containerRef = useRef<HTMLDivElement | null>(null);
-    const {theme} = useContext(ThemeContext)
+    const { theme } = useContext(ThemeContext);
+    const abortControllerRef = useRef(null);
+
+    const handleCancel = () => {
+        if (abortControllerRef.current) {
+            setHistory((history) => [
+                ...history,
+                {
+                    role: "assistant",
+                    content: temp[temp.length - 1]?.content || "",
+                },
+            ]);
+            // Clear the temp chat
+            setTemp([]);
+            abortControllerRef.current.abort();
+        }
+    };
+
+    const CommunicateWithGPT = () => {
+        if (!loading) {
+            return;
+        }
+
+        // Create an AbortController instance and store it in the ref
+        abortControllerRef.current = new AbortController();
+        setTemp([{ role: "assistant", content: "" }]);
+        setIsBottom(true);
+        fetch("/api/gpt", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ history }),
+            signal: abortControllerRef.current.signal, // Pass the signal to the fetch options
+        })
+            .then(handleResponse)
+            .then(() => {})
+            .catch((e) => {
+                if (e.name === "AbortError") {
+                    console.log("Fetch request was canceled");
+                } else {
+                    console.error(e);
+                    toast.error(e);
+                    toast.update(toastId, {
+                        render: "fail to load",
+                        type: "error",
+                        isLoading: false,
+                        autoClose: 500,
+                    });
+                }
+            })
+            .finally(() => {
+                setLoading(false);
+
+                // Clean up the abort controller
+                abortControllerRef.current = null;
+            });
+    };
+
     const storeHistory = () => {
         if (history.length === 0) {
             return;
@@ -38,11 +96,6 @@ export default function Dialog() {
         setHistory(historyJson);
         const lastPrompt = historyJson.slice(-1)[0];
         if (lastPrompt["role"] == "user" && !loading) {
-            setToastId(
-                toast.loading("generating...", {
-                    position: toast.POSITION.TOP_CENTER,
-                })
-            );
             setLoading(true);
         }
 
@@ -50,48 +103,6 @@ export default function Dialog() {
             setLoading(false);
             setTemp([]);
         };
-    }
-
-    function CommunicateWithGPT() {
-        if (!loading) {
-            return;
-        }
-        setIsBottom(true);
-        fetch("/api/gpt", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ history }),
-        })
-            .then(handleResponse)
-            .then(() => {
-                toast.update(toastId, {
-                    render: "Done",
-                    type: "success",
-                    isLoading: false,
-                    autoClose: 100,
-                });
-            })
-            .catch((e) => {
-                console.error(e);
-                toast.error(e);
-                toast.update(toastId, {
-                    render: "fail to load",
-                    type: "error",
-                    isLoading: false,
-                    autoClose: 500,
-                });
-            })
-            .finally(() => {
-                setLoading(false);
-                toast.update(toastId, {
-                    render: "Done",
-                    type: "success",
-                    isLoading: false,
-                    autoClose: 100,
-                });
-            });
     }
 
     async function handleResponse(response: Response) {
@@ -108,13 +119,16 @@ export default function Dialog() {
                 }
                 newContent += new TextDecoder().decode(value);
                 setTemp([{ role: "assistant", content: newContent }]);
-                
+
                 if (containerRef.current) {
                     const { scrollTop, scrollHeight, clientHeight } =
                         containerRef.current;
-                    if (!start ||scrollTop + clientHeight + 50 >= scrollHeight) {
+                    if (
+                        !start ||
+                        scrollTop + clientHeight + 50 >= scrollHeight
+                    ) {
                         setIsBottom(true);
-                        start = true
+                        start = true;
                     } else {
                         setIsBottom(false);
                     }
@@ -131,11 +145,7 @@ export default function Dialog() {
         const newHistory = history.concat({ role: "user", content: prompt });
         console.log(prompt);
         setHistory(newHistory);
-        setToastId(
-            toast.loading("generating...", {
-                position: toast.POSITION.TOP_CENTER,
-            })
-        );
+
         setLoading(true);
     }
 
@@ -148,10 +158,12 @@ export default function Dialog() {
     useEffect(CommunicateWithGPT, [loading]);
 
     return (
-        <div className="hscreen_for_mobile grid break-words transform-gpu  grid-cols-1 justify-items-center overflow-y-auto "
-        style={{background:theme.userBackground}}>
+        <div
+            className="hscreen_for_mobile grid transform-gpu grid-cols-1  justify-items-center overflow-y-auto break-words "
+            style={{ background: theme.userBackground }}
+        >
             <div
-                className="w-full  overflow-y-scroll pb-[120px] text-center"
+                className="w-full  overflow-y-scroll pb-[220px] text-center"
                 ref={containerRef}
             >
                 {MarkdownMemo}
@@ -161,12 +173,37 @@ export default function Dialog() {
                     container={containerRef.current}
                 />
             </div>
-            <div className="fixed bottom-0 h-[100px] w-full "
+            <div
+                className="fixed bottom-0 h-[100px] w-full "
                 style={{
-                    background: `linear-gradient(to bottom, transparent, ${theme.userBackground},${theme.userBackground})`
+                    background: `linear-gradient(to bottom, transparent, ${theme.userBackground},${theme.userBackground})`,
                 }}
             ></div>
             {!loading && <InputBar sendPrompt={sendPrompt} />}
+
+            {loading && (
+                <button
+                    onClick={handleCancel}
+                    className="fixed bottom-[100px] flex rounded-md border border-gray-300 bg-white py-3 px-6 font-medium text-gray-700 shadow-sm hover:bg-gray-100
+"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="mr-4 h-6 w-6"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5.25 7.5A2.25 2.25 0 017.5 5.25h9a2.25 2.25 0 012.25 2.25v9a2.25 2.25 0 01-2.25 2.25h-9a2.25 2.25 0 01-2.25-2.25v-9z"
+                        />
+                    </svg>
+                    中断生成
+                </button>
+            )}
         </div>
     );
 }

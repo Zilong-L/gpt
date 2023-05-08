@@ -6,6 +6,7 @@ import { defaultHistory } from "pages/api/Message";
 import { ThemeContext } from "components/ThemeContext";
 import { useContext } from "react";
 import styled from "styled-components";
+import UserMenu from "./UserMenu";
 
 type Item = {
     label: string;
@@ -87,7 +88,7 @@ const SideList: React.FC<SideListProps> = ({ items, setItems }) => {
     };
     return (
         <div
-            className="flex h-full select-none flex-col overflow-y-auto   "
+            className="flex h-full select-none flex-col justify-between py-2  "
             style={{ background: theme.background }}
         >
             <div className="">
@@ -95,11 +96,18 @@ const SideList: React.FC<SideListProps> = ({ items, setItems }) => {
                     开启新对话
                 </StyledList>
             </div>
-            {items.map((item: Item) => (
-                <div key={item.id} className="p-2">
-                    <SideListItem {...Props} item={item} theme={theme} />
-                </div>
-            ))}
+            <div className="flex-grow overflow-y-auto">
+                {items.map((item: Item) => (
+                    <div key={item.id} className="p-2">
+                        <SideListItem {...Props} item={item} theme={theme} />
+                    </div>
+                ))}
+            </div>
+            <hr className="my-4 w-[90%] self-center border-t border-gray-300" />
+
+            <div className="w-[95%] self-center">
+                <UserMenu />
+            </div>
         </div>
     );
 };
